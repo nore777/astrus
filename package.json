@@ -1,0 +1,17 @@
+{
+  "name": "cdnnode",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "NODE_ENV=development npx tsx --env-file=.env.dev --watch ./src/app.ts",
+    "build": "tsc",
+    "start": "NODE_ENV=production node --env-file=.env.prod dist/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.13.10"
+  }
+}
