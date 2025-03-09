@@ -1,7 +1,5 @@
 import getIP from './getIP';
-import IConfig from '../types/IConfig';
-import _config from '../../config.json';
-const config = _config as IConfig
+import config from '../../config.json';
 
 export default function init() {
 
