@@ -1,4 +1,4 @@
-import { networkInterfaces } from "node:os"
+import { networkInterfaces } from 'node:os'
 
 export default function getIP(): string | undefined {
   const net = networkInterfaces()
