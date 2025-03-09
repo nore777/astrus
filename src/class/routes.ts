@@ -1,4 +1,4 @@
-import { buildServerSegments } from '../utils/segments'
+import { buildClientSegments, buildServerSegments } from '../utils/segments'
 import { THTTPRequestMethods } from '../types/types'
 import { IncomingMessage, ServerResponse } from 'http'
 
@@ -6,7 +6,7 @@ import { IncomingMessage, ServerResponse } from 'http'
 class Node {
   type: string | undefined
   value: string | undefined
-  func: () => void
+  func: (req: IncomingMessage, res: ServerResponse) => void
   children: { [key: string]: Node }
   isLeaf: boolean
 
@@ -40,8 +40,8 @@ export default class Routes {
     }
   }
 
-  create(method: THTTPRequestMethods, path: string, func: () => void) {
-    let current = this.root[method as THTTPRequestMethods]
+  create(method: THTTPRequestMethods, path: string, func: (req: IncomingMessage, res: ServerResponse) => void) {
+    let current = this.root[method]
     const segments = buildServerSegments(path)
 
     for (let i = 0; i < segments.length; i++) {
@@ -62,6 +62,20 @@ export default class Routes {
     }
     current.isLeaf = true
     current.func = func
+  }
+
+  search(method: THTTPRequestMethods, url: string) {
+    const segments = buildClientSegments(url)
+    let current = this.root[method]
+
+    for (let i = 0; i < segments.length; i++) {
+      if (current && current.children) {
+        current = current.children[segments[i]]
+      } else {
+        return null
+      }
+    }
+    return current
   }
 
 }
