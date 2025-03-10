@@ -3,7 +3,7 @@ import { networkInterfaces } from 'node:os'
 export default function getIP(): string | undefined {
   const net = networkInterfaces()
 
-  let IP = null;
+  let IP = '';
 
   for (const interfaceName in net) {
 
@@ -18,7 +18,7 @@ export default function getIP(): string | undefined {
       }
     }
 
-    if (IP) return IP
+    if (IP && IP !== '') return IP
   }
 
   return undefined
