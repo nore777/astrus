@@ -1,17 +1,18 @@
 import { buildClientSegments, buildServerSegments } from '../utils/segments'
 import { THTTPRequestMethods } from '../types/types'
+import { Request, Response } from './exchange'
 import { IncomingMessage, ServerResponse } from 'http'
 
 
 class Node {
-  type: string | undefined
+  dynamic: boolean | undefined
   value: string | undefined
-  func: (req: IncomingMessage, res: ServerResponse) => void
+  func: (req: Request, res: Response) => void
   children: { [key: string]: Node }
   isLeaf: boolean
 
   constructor() {
-    this.type = undefined
+    this.dynamic = undefined
     this.value = undefined
     this.func = () => { }
     this.children = {}
@@ -20,6 +21,8 @@ class Node {
 }
 
 export default class Routes {
+
+  _init: any[]
   root: {
     GET: Node
     HEAD: Node
@@ -30,6 +33,7 @@ export default class Routes {
   }
 
   constructor() {
+    this._init = []
     this.root = {
       GET: new Node(),
       HEAD: new Node(),
@@ -40,7 +44,21 @@ export default class Routes {
     }
   }
 
-  create(method: THTTPRequestMethods, path: string, func: (req: IncomingMessage, res: ServerResponse) => void) {
+  init(method: THTTPRequestMethods, path: string, func: (req: any, res: any) => void) {
+    this._init.push({ method, path, func })
+  }
+
+  assign(routes: Routes) {
+    for (let i = 0; i < routes._init.length; ++i) {
+      this.create(
+        routes._init[i].method,
+        routes._init[i].path,
+        routes._init[i].func
+      )
+    }
+  }
+
+  create(method: THTTPRequestMethods, path: string, func: (req: any, res: any) => void) {
     let current = this.root[method]
     const segments = buildServerSegments(path)
 
@@ -48,7 +66,7 @@ export default class Routes {
 
       let newNode = new Node()
       newNode.value = segments[i].value!
-      newNode.type = segments[i].type!
+      newNode.dynamic = segments[i].dynamic!
 
       if (!current.children[segments[i].value as string]) {
         current.children = {
@@ -62,20 +80,47 @@ export default class Routes {
     }
     current.isLeaf = true
     current.func = func
+    console.log("Route created:", `[${method}]` + path)
   }
 
-  search(method: THTTPRequestMethods, url: string) {
-    const segments = buildClientSegments(url)
-    let current = this.root[method]
+  async search(method: THTTPRequestMethods, url: string) {
+    try {
+      const segments = buildClientSegments(url);
+      let dynamicSegments = {}
+      let current = this.root[method];
+      let prev = current;
 
-    for (let i = 0; i < segments.length; i++) {
-      if (current && current.children) {
-        current = current.children[segments[i]]
-      } else {
-        return null
+      let i = 0;
+      while (i < segments.length) {
+        if (current) {
+          current = (
+            current.children[segments[i]] ||
+            Object.values(prev.children).find(item => item.dynamic === true) ||
+            null
+          )
+          if (current && current.dynamic === true) {
+            dynamicSegments = {
+              ...dynamicSegments,
+              [current.value as string]: segments[i] as any
+            }
+          }
+        }
+        prev = current;
+        i++
       }
-    }
-    return current
-  }
 
+      if (current && i === segments.length) {
+        return {
+          func: current.func,
+          segments: dynamicSegments
+        }
+
+      }
+      return null
+
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  }
 }
