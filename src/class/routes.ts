@@ -1,7 +1,7 @@
 import { buildClientSegments, buildServerSegments } from '../utils/segments'
 import { THTTPRequestMethods } from '../types/types'
-import { Request, Response } from './exchange'
-import { IncomingMessage, ServerResponse } from 'http'
+import { Request } from './request'
+import { Response } from './response'
 
 
 class Node {
@@ -22,7 +22,7 @@ class Node {
 
 export default class Routes {
 
-  _init: any[]
+  private _init: any[]
   root: {
     GET: Node
     HEAD: Node
@@ -58,15 +58,15 @@ export default class Routes {
     }
   }
 
-  create(method: THTTPRequestMethods, path: string, func: (req: any, res: any) => void) {
+  private create(method: THTTPRequestMethods, path: string, func: (req: any, res: any) => void) {
     let current = this.root[method]
     const segments = buildServerSegments(path)
 
     for (let i = 0; i < segments.length; i++) {
 
       let newNode = new Node()
-      newNode.value = segments[i].value!
-      newNode.dynamic = segments[i].dynamic!
+      newNode.value = segments[i].value
+      newNode.dynamic = segments[i].dynamic
 
       if (!current.children[segments[i].value as string]) {
         current.children = {
@@ -76,11 +76,10 @@ export default class Routes {
           }
         }
       }
-      current = current.children[segments[i].value!]
+      current = current.children[segments[i].value]
     }
     current.isLeaf = true
     current.func = func
-    console.log("Route created:", `[${method}]` + path)
   }
 
   async search(method: THTTPRequestMethods, url: string) {

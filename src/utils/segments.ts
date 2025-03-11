@@ -43,6 +43,18 @@ export function buildServerSegments(url: string) {
     }
   }
 
+  for (let i = 0; i < segments.length; i++) {
+    for (let j = 0; j < segments.length; j++) {
+      const s1 = segments[i]
+      const s2 = segments[j]
+      if (s1.dynamic && s2.dynamic && s1.value === s2.value && i !== j) {
+        throw new Error(
+          `Duplicate dynamic segments found at \x1b[31m${url}\x1b[0m, ${s1.value} === ${s2.value}`
+        ).stack
+      }
+    }
+  }
+
   return segments
 }
 
