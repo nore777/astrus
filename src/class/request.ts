@@ -5,6 +5,7 @@ import { Socket } from 'net'
 export class Request {
   constructor(request: _REQ) {
     this.request = request
+    this.segments = {}
   }
 
   request: _REQ

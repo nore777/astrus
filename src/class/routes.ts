@@ -20,27 +20,35 @@ class Node {
   }
 }
 
-export default class Routes {
+export class Routes {
 
   private _init: any[]
+
   root: {
     GET: Node
     HEAD: Node
     POST: Node
     PUT: Node
-    PATCH: Node
     DELETE: Node
+    CONNECT: Node
+    OPTIONS: Node
+    TRACE: Node
+    PATCH: Node
   }
 
   constructor() {
     this._init = []
+
     this.root = {
       GET: new Node(),
       HEAD: new Node(),
       POST: new Node(),
       PUT: new Node(),
+      DELETE: new Node(),
+      CONNECT: new Node(),
+      OPTIONS: new Node(),
+      TRACE: new Node(),
       PATCH: new Node(),
-      DELETE: new Node()
     }
   }
 
@@ -76,7 +84,7 @@ export default class Routes {
           }
         }
       }
-      current = current.children[segments[i].value]
+      current = current.children[segments[i].value!]
     }
     current.isLeaf = true
     current.func = func
