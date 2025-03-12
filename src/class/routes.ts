@@ -1,6 +1,6 @@
 import { buildClientSegments, buildServerSegments } from '../utils/segments'
 import { THTTPRequestMethods } from '../types/types'
-import { Request } from './request'
+import { _REQ, Request } from './request'
 import { Response } from './response'
 
 
@@ -20,11 +20,12 @@ class Node {
   }
 }
 
-export class Routes {
+
+export default class Routes {
 
   private _init: any[]
 
-  root: {
+  private root: {
     GET: Node
     HEAD: Node
     POST: Node
@@ -50,15 +51,24 @@ export class Routes {
       TRACE: new Node(),
       PATCH: new Node(),
     }
+    this.test = "XD"
   }
+  test: string
 
-  init(method: THTTPRequestMethods, path: string, func: (req: any, res: any) => void) {
+  /**
+   * Initializes a new route.
+   */
+  init(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void) {
+    this.create(method, path, func)
     this._init.push({ method, path, func })
   }
 
-  assign(routes: Routes) {
+  /**
+   * Appends the routes with the specified object
+   */
+  append(routes: Routes) {
     for (let i = 0; i < routes._init.length; ++i) {
-      this.create(
+      this._init.push(
         routes._init[i].method,
         routes._init[i].path,
         routes._init[i].func
@@ -66,7 +76,7 @@ export class Routes {
     }
   }
 
-  private create(method: THTTPRequestMethods, path: string, func: (req: any, res: any) => void) {
+  private create(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void) {
     let current = this.root[method]
     const segments = buildServerSegments(path)
 
@@ -75,6 +85,7 @@ export class Routes {
       let newNode = new Node()
       newNode.value = segments[i].value
       newNode.dynamic = segments[i].dynamic
+
 
       if (!current.children[segments[i].value as string]) {
         current.children = {
@@ -90,44 +101,38 @@ export class Routes {
     current.func = func
   }
 
-  async search(method: THTTPRequestMethods, url: string) {
-    try {
-      const segments = buildClientSegments(url);
-      let dynamicSegments = {}
-      let current = this.root[method];
-      let prev = current;
+  search(req: _REQ) {
+    const segments = buildClientSegments(req.url as string);
+    let dynamicSegments = {}
+    let current = this.root[req.method as THTTPRequestMethods];
+    let prev = current;
 
-      let i = 0;
-      while (i < segments.length) {
-        if (current) {
-          current = (
-            current.children[segments[i]] ||
-            Object.values(prev.children).find(item => item.dynamic === true) ||
-            null
-          )
-          if (current && current.dynamic === true) {
-            dynamicSegments = {
-              ...dynamicSegments,
-              [current.value as string]: segments[i] as any
-            }
+
+    let i = 0;
+    while (i < segments.length) {
+      if (current) {
+        current = (
+          current.children[segments[i]] ||
+          Object.values(prev.children).find(item => item.dynamic === true) ||
+          null
+        )
+        if (current && current.dynamic === true) {
+          dynamicSegments = {
+            ...dynamicSegments,
+            [current.value as string]: segments[i] as string | number
           }
         }
-        prev = current;
-        i++
       }
-
-      if (current && i === segments.length) {
-        return {
-          func: current.func,
-          segments: dynamicSegments
-        }
-
-      }
-      return null
-
-    } catch (error) {
-      console.log(error)
-      return null
+      prev = current;
+      i++
     }
+
+    if (current && i === segments.length) {
+      req.wrapper.segments = dynamicSegments
+      return current.func
+    }
+
+    return null
   }
 }
+
