@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "target": "es2019",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "declaration": true,
     "outDir": "./lib",
     "esModuleInterop": true,

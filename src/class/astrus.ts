@@ -4,7 +4,7 @@ import { _RES, Response } from './response';
 import { RequestListener } from 'node:http';
 import { THTTPRequestMethods } from '../types/types';
 
-export class Jevel {
+export default class Jevel {
   constructor() {
     this.#routes = new Routes()
 
@@ -27,5 +27,4 @@ export class Jevel {
   route(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void) {
     this.#routes.init(method, path, func)
   }
-
 }

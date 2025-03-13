@@ -1,4 +1,4 @@
-import { Jevel } from "./class/jevel";
+import Astrus from "./class/astrus";
 import { _REQ, Request } from "./class/request";
 import { _RES, Response } from "./class/response";
 import { ServerOptions } from "http";
@@ -8,17 +8,10 @@ const options: ServerOptions = {
   ServerResponse: _RES,
 }
 
-export default Jevel;
-export {
+export default Astrus;
+exports = {
   options,
   Request,
   Response,
 };
-
-module.exports = Jevel;
-Object.assign(module.exports, {
-  options,
-  Request,
-  Response,
-});
 
