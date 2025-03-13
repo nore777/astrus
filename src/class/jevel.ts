@@ -4,16 +4,13 @@ import { _RES, Response } from './response';
 import { RequestListener } from 'node:http';
 import { THTTPRequestMethods } from '../types/types';
 
-export class Astrus {
-  private routes: Routes
-  server: RequestListener<typeof _REQ, typeof _RES> = (req: _REQ, res: _RES) => { }
-
+export class Jevel {
   constructor() {
-    this.routes = new Routes()
+    this.#routes = new Routes()
 
     this.server = (req: _REQ, res: _RES) => {
       if (req !== undefined) {
-        const found = this.routes.search(req) || null
+        const found = this.#routes.search(req) || null
         if (found) {
           return found(req.wrapper, res.wrapper)
         }
@@ -24,9 +21,11 @@ export class Astrus {
     }
   }
 
+  #routes: Routes
+  server: RequestListener<typeof _REQ, typeof _RES> = (req: _REQ, res: _RES) => { }
 
   route(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void) {
-    this.routes.init(method, path, func)
+    this.#routes.init(method, path, func)
   }
 
 }
