@@ -41,8 +41,8 @@ export default class Jevel {
     this.routes.init(method, path, func)
   }
 
-  start(port: number, options: any) {
-    const server = http.createServer(options, this.requestListener)
+  start(port: number) {
+    const server = http.createServer({ IncomingMessage: _REQ, ServerResponse: _RES }, this.requestListener)
     server.listen(port, () => { console.log("[Server Started]") })
   }
 }
