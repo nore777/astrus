@@ -25,7 +25,6 @@ export class Response {
   }
 }
 
-
 export class _RES<Request extends IncomingMessage = IncomingMessage> extends ServerResponse<Request> {
   constructor(req: Request) {
     super(req)

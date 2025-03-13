@@ -3,14 +3,15 @@ import { Socket } from 'net'
 
 
 export class Request {
-  private request: _REQ
+  request: _REQ
   segments: { [key: string]: string }
+  body: Object | string
 
   constructor(request: _REQ) {
     this.request = request
     this.segments = {}
+    this.body = {}
   }
-
 }
 
 export class _REQ extends IncomingMessage {

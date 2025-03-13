@@ -1,7 +1,7 @@
-import { buildClientSegments, buildServerSegments } from '../utils/segments'
-import { THTTPRequestMethods } from '../types/types'
-import { _REQ, Request } from './request'
-import { Response } from './response'
+import { buildClientSegments, buildServerSegments } from '../utils/segments.js'
+import { THTTPRequestMethods } from '../types/types.js'
+import { _REQ, Request } from './request.js'
+import { Response } from './response.js'
 
 
 class Node {
@@ -51,9 +51,7 @@ export default class Routes {
       TRACE: new Node(),
       PATCH: new Node(),
     }
-    this.test = "XD"
   }
-  test: string
 
   /**
    * Initializes a new route.

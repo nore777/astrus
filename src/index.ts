@@ -1,6 +1,6 @@
-import Astrus from "./class/astrus";
-import { _REQ, Request } from "./class/request";
-import { _RES, Response } from "./class/response";
+import Astrus from "./class/astrus.js";
+import { _REQ, Request } from "./class/request.js";
+import { _RES, Response } from "./class/response.js";
 import { ServerOptions } from "http";
 
 const options: ServerOptions = {
@@ -8,10 +8,12 @@ const options: ServerOptions = {
   ServerResponse: _RES,
 }
 
-export default Astrus;
-exports = {
+
+export default Astrus
+export {
   options,
   Request,
   Response,
 };
+
 

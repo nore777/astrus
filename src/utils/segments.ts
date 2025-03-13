@@ -1,4 +1,4 @@
-import ISegment from '../types/ISegment'
+import ISegment from '../types/ISegment.js'
 
 // parses url passed from client into segments
 export function buildClientSegments(url: string): string[] {
