@@ -1,14 +1,17 @@
 {
   "name": "astrus",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/index.js",
+  "type": "module",
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc"
   },
-  "keywords": ["astrus", "server", "framework"],
+  "keywords": ["astrus", "web", "framework"],
   "files": [
-    "lib/"
+    "lib/",
+    "README.md",
+    "LICENSE"
   ],
   "author": "nore777",
   "license": "MIT",
