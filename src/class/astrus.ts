@@ -62,17 +62,23 @@ export default class Jevel {
 
   route(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void): void;
   route(routes: IRoute[]): void;
+  route(routes: IRoute): void;
   route(
-    methodRoute: THTTPRequestMethods | IRoute[],
+    methodRoute: THTTPRequestMethods | IRoute[] | IRoute,
     path?: string,
     func?: (req: Request, res: Response) => void,
-    routes?: IRoute[]
   ) {
-    if (typeof methodRoute === "string" && path && func) {
+    if (typeof methodRoute === 'string' && path && func) {
       this.routes.init({ method: methodRoute, path, func })
-    } else if (routes) {
-      for (let i = 0; i < routes.length; i++) {
-        this.routes.init(routes[i])
+    } else {
+      if (Array.isArray(methodRoute)) {
+        console.log("Initializing array of routes")
+        for (let i = 0; i < methodRoute.length; i++) {
+          this.routes.init(methodRoute[i] as IRoute)
+        }
+      } else {
+        console.log(methodRoute, "Initializing single route")
+        this.routes.init(methodRoute as IRoute)
       }
     }
   }
