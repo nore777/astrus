@@ -6,15 +6,18 @@ import IRoute from "./types/IRoute.js";
 
 const route = (method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void) => {
   const route: IRoute = { method, path, func }
-  console.log("external route", route)
   return route
 }
+
+const controller = (func: (req: Request, res: Response) => void) => {
+  return func
+};
 
 export default Astrus
 export {
   route,
+  controller,
   Request,
   Response,
 };
-
 
