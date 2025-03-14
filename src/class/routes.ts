@@ -2,6 +2,7 @@ import { buildClientSegments, buildServerSegments } from '../utils/segments.js'
 import { THTTPRequestMethods } from '../types/types.js'
 import { _REQ, Request } from './request.js'
 import { Response } from './response.js'
+import IRoute from '../types/IRoute.js'
 
 
 class Node {
@@ -23,7 +24,7 @@ class Node {
 
 export default class Routes {
 
-  private _init: any[]
+  private _init: IRoute[]
 
   private root: {
     GET: Node
@@ -56,27 +57,14 @@ export default class Routes {
   /**
    * Initializes a new route.
    */
-  init(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void) {
-    this.create(method, path, func)
-    this._init.push({ method, path, func })
+  init(route: IRoute) {
+    this.create(route)
+    this._init.push(route)
   }
 
-  /**
-   * Appends the routes with the specified object
-   */
-  append(routes: Routes) {
-    for (let i = 0; i < routes._init.length; ++i) {
-      this._init.push(
-        routes._init[i].method,
-        routes._init[i].path,
-        routes._init[i].func
-      )
-    }
-  }
-
-  private create(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void) {
-    let current = this.root[method]
-    const segments = buildServerSegments(path)
+  private create(route: IRoute) {
+    let current = this.root[route.method]
+    const segments = buildServerSegments(route.path)
 
     for (let i = 0; i < segments.length; i++) {
 
@@ -96,7 +84,7 @@ export default class Routes {
       current = current.children[segments[i].value!]
     }
     current.isLeaf = true
-    current.func = func
+    current.func = route.func
   }
 
   search(req: _REQ) {
