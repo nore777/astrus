@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc"
   },
-  "keywords": ["astrus", "web", "framework"],
+  "keywords": ["astrus", "web", "backend", "framework", "RESTful", "typescript", "javascript", "ESM"],
   "files": [
     "lib/",
     "README.md",
