@@ -1,3 +1,4 @@
+![Astrus](https://imgur.com/qfOjy3v.png)
 # Astrus
 Astrus is a Node.js web framework focused on fast API development. This project is in alpha and it **might contain breaking changes** in the future, use at your own discretion.
 
