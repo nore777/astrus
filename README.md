@@ -8,26 +8,36 @@ npm i astrus
 ```
 
 ```javascript
-import astrus from 'astrus' // Only supports ESM
+import astrus, { route, controller } from 'astrus' /* Only supports ESM */
 
 
+// New Astrus instance
 const app = new astrus()
 
-app.route('GET', '/hello/:segment', async (req, res) => {
-  try {
-    const { segment } = req.segments
-    res.send(`hello ${segment}`)
-  } catch (error) {
-    res.error()
-  }
+
+// Controller
+const testController = controller((req, res) => {
+  res.send("hello world")
 })
 
-app.route('POST', '/hello', async (req, res) => {
-  try {
-    res.send(req.body)
-  } catch (error) {
-    res.error()
-  }
+
+// Different route initiations
+const testRoute = route('GET', '/test0', testController)
+const testRoutes = [
+  route('GET', '/test1', testController),
+  route('GET', '/test2', (req, res) => {
+    res.send("hello world")
+  }),
+]
+
+app.route(testRoute)
+app.route(testRoutes) // accepts arrays
+
+
+// Dynamic segments (params)
+app.route('GET', '/test4/:segment', (req, res) => {
+  const { segment } = req.segments
+  res.send(segment)
 })
 
 app.start(8000)
