@@ -8,6 +8,10 @@ export class Response {
     this.response = res
   }
 
+  header(name: string, value: string) {
+    this.response.setHeader(name, value)
+  }
+
   send(data: string | number | Object) {
     if (typeof data === 'object') {
       this.response.setHeader('content-type', 'application/json')
