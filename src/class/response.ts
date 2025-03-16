@@ -12,8 +12,10 @@ export class Response {
     this.response.setHeader(name, value)
   }
 
-  send(data: string | number | Object) {
-    if (typeof data === 'object') {
+  send(data: string | number | Object | Buffer) {
+    if (Buffer.isBuffer(data)) {
+      this.response.end(data)
+    } else if (typeof data === 'object') {
       this.response.setHeader('content-type', 'application/json')
       this.response.write(JSON.stringify(data))
       this.response.end()
