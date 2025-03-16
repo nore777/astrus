@@ -1,5 +1,6 @@
 ![Astrus](https://imgur.com/qfOjy3v.png)
 # Astrus
+[GITHUB](https://github.com/nore777/astrus) | [NPM](https://www.npmjs.com/package/astrus)
 Astrus is a Node.js web framework focused on fast API development. This project is in alpha and it **might contain breaking changes** in the future, use at your own discretion.
 
 ## getting started
@@ -40,6 +41,16 @@ app.route('GET', '/test4/:segment', (req, res) => {
   const { segment } = req.segments
   res.send(segment)
 })
+
+
+// Supports multipart form-data
+app.route('GET', '/test5', (req, res) => {
+  const { image } = req.body
+  console.log(image.filename)
+  res.header('content-type', image.mime)
+  res.send(image.value)
+})
+
 
 app.start(8000)
 ```
