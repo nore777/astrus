@@ -1,6 +1,7 @@
 ![Astrus](https://imgur.com/qfOjy3v.png)
 # Astrus
 [GITHUB](https://github.com/nore777/astrus) | [NPM](https://www.npmjs.com/package/astrus)
+
 Astrus is a Node.js web framework focused on fast API development. This project is in alpha and it **might contain breaking changes** in the future, use at your own discretion.
 
 ## getting started
