@@ -7,6 +7,7 @@ import IRoute from '../types/IRoute.js'
 
 class Node {
   dynamic: boolean | undefined
+  wildcard: boolean | undefined
   value: string | undefined
   func: (req: Request, res: Response) => void
   children: { [key: string]: Node }
@@ -14,6 +15,7 @@ class Node {
 
   constructor() {
     this.dynamic = undefined
+    this.wildcard = undefined
     this.value = undefined
     this.func = () => { }
     this.children = {}
@@ -71,6 +73,7 @@ export default class Routes {
       let newNode = new Node()
       newNode.value = segments[i].value
       newNode.dynamic = segments[i].dynamic
+      newNode.wildcard = segments[i].wildcard
 
 
       if (!current.children[segments[i].value as string]) {
@@ -92,6 +95,7 @@ export default class Routes {
     let dynamicSegments = {}
     let current = this.root[req.method as THTTPRequestMethods];
     let prev = current;
+    let foundWildcard = false
 
 
     let i = 0;
@@ -100,8 +104,13 @@ export default class Routes {
         current = (
           current.children[segments[i]] ||
           Object.values(prev.children).find(item => item.dynamic === true) ||
+          Object.values(prev.children).find(item => item.wildcard === true) ||
           null
         )
+        if (current && current.wildcard === true) {
+          foundWildcard = true
+          break;
+        }
         if (current && current.dynamic === true) {
           dynamicSegments = {
             ...dynamicSegments,
@@ -109,8 +118,15 @@ export default class Routes {
           }
         }
       }
+
       prev = current;
       i++
+    }
+
+    req.wrapper.url = req.url as string
+
+    if (foundWildcard === true) {
+      return current.func
     }
 
     if (current && i === segments.length) {
