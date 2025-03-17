@@ -19,6 +19,10 @@ import astrus, { route, controller } from 'astrus' /* Only supports ESM */
 const app = new astrus()
 
 
+// Serve static files
+app.static('./public', '/public')
+
+
 // Controller
 const testController = controller((req, res) => {
   res.send("hello world")
