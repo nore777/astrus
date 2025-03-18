@@ -4,18 +4,10 @@ import { _RES, Response } from './response.js';
 import http, { RequestListener } from 'node:http';
 import { THTTPRequestMethods } from '../types/types.js';
 import IRoute from '../types/IRoute.js';
-import parseBody from '../utils/parseBody.js';
-import fs from 'fs'
+import continueToRoute from '../utils/continueToRoute.js';
+import fileToContentType from '../utils/fileToContentType.js';
+import fsp from 'fs/promises'
 
-
-const continueToRoute: { [key in any]: (route: Function, req: _REQ, res: _RES) => void | boolean } = {
-  'GET': (route, req, res) => {
-    route(req.wrapper, res.wrapper)
-  },
-  'POST': (route, req, res) => {
-    parseBody(route, req, res)
-  }
-}
 
 export default class Astrus {
   private routes: Routes
@@ -44,10 +36,18 @@ export default class Astrus {
   static(directory: string, url: string) {
     this.route('GET', url + '/*', async (req, res) => {
       try {
-        const filePath = directory + req.url.substring(url.length, req.url.length)
-        res.send(fs.readFileSync(filePath))
+        const _url = req.url.substring(url.length, req.url.length)
+        const filePath = directory + _url
+        const fileExtention = _url.split('.')[1]
+        const contentType = fileToContentType[fileExtention] || 'application/octet-stream'
+        console.log(contentType)
 
+        const file = await fsp.readFile(filePath)
+
+        res.header('Content-Type', contentType)
+        res.send(file)
       } catch (error) {
+        console.log(error)
         res.error()
       }
     })
