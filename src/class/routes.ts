@@ -97,9 +97,12 @@ export default class Routes {
     let prev = current;
     let foundWildcard = false
 
+    if (segments.length === 0 && !current.isLeaf) {
+      return null
+    }
 
     let i = 0;
-    while (i <= segments.length) {
+    while (i < segments.length) {
       if (current) {
         current = (
           current.children[segments[i]] ||
