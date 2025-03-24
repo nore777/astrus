@@ -22,7 +22,8 @@ export default class Astrus {
         try {
           continueToRoute[req.method as THTTPRequestMethods](found, req, res)
         } catch (error) {
-          res.write('Method not allowed')
+          console.log(error)
+          res.write(error)
           res.end()
         }
       } else {
@@ -40,14 +41,12 @@ export default class Astrus {
         const filePath = directory + _url
         const fileExtention = _url.split('.')[1]
         const contentType = fileToContentType[fileExtention] || 'application/octet-stream'
-        console.log(contentType)
 
         const file = await fsp.readFile(filePath)
 
         res.header('Content-Type', contentType)
         res.send(file)
       } catch (error) {
-        console.log(error)
         res.error()
       }
     })

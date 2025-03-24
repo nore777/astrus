@@ -20,8 +20,7 @@ export class Response {
       this.response.write(JSON.stringify(data))
       this.response.end()
     } else {
-      this.response.write(data)
-      this.response.end()
+      this.response.end(data)
     }
   }
 
