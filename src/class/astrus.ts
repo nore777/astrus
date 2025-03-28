@@ -2,7 +2,7 @@ import Routes from './routes.js';
 import { _REQ, Request } from './request.js';
 import { _RES, Response } from './response.js';
 import http, { RequestListener } from 'node:http';
-import { THTTPRequestMethods } from '../types/types.js';
+import { THTTPRequestMethods, TMiddlewares, TRouteHandler } from '../types/types.js';
 import IRoute from '../types/IRoute.js';
 import continueToRoute from '../utils/continueToRoute.js';
 import fileToContentType from '../utils/fileToContentType.js';
@@ -11,7 +11,6 @@ import fsp from 'fs/promises'
 
 export default class Astrus {
   private routes: Routes
-  private statics = {}
   private requestListener: RequestListener<typeof _REQ, typeof _RES> = (req: _REQ, res: _RES) => { }
 
   constructor() {
@@ -20,7 +19,18 @@ export default class Astrus {
       const found = this.routes.search(req) || null
       if (found) {
         try {
-          continueToRoute[req.method as THTTPRequestMethods](found, req, res)
+          if (found.middlewares) {
+            for (let middleware of found.middlewares) {
+              if (!res.writableEnded) {
+                middleware(req.wrapper as Request, res.wrapper as Response, () => { })
+              } else break
+            }
+          }
+
+          if (!res.writableEnded) {
+            continueToRoute[req.method as THTTPRequestMethods](found.func, req, res)
+          }
+
         } catch (error) {
           console.log(error)
           res.write(error)
@@ -52,16 +62,41 @@ export default class Astrus {
     })
   }
 
-  route(method: THTTPRequestMethods, path: string, func: (req: Request, res: Response) => void): void;
+
+  route(
+    method: THTTPRequestMethods,
+    path: string,
+    func: TRouteHandler
+  ): void;
+  route(
+    method: THTTPRequestMethods,
+    path: string,
+    middlewares: TMiddlewares,
+    func: TRouteHandler
+  ): void;
   route(routes: IRoute[]): void;
   route(routes: IRoute): void;
   route(
     methodRoute: THTTPRequestMethods | IRoute[] | IRoute,
     path?: string,
-    func?: (req: Request, res: Response) => void,
+    funcOrMiddlewares?: TMiddlewares | TRouteHandler,
+    func?: TRouteHandler,
   ) {
-    if (typeof methodRoute === 'string' && path && func) {
-      this.routes.init({ method: methodRoute, path, func })
+    if (typeof methodRoute === 'string' && path && funcOrMiddlewares) {
+      if (Array.isArray(funcOrMiddlewares)) {
+        this.routes.init({
+          method: methodRoute,
+          path,
+          middlewares: funcOrMiddlewares as TMiddlewares,
+          func: func as TRouteHandler
+        })
+      } else {
+        this.routes.init({
+          method: methodRoute,
+          path,
+          func: funcOrMiddlewares as TRouteHandler
+        })
+      }
     } else {
       if (Array.isArray(methodRoute)) {
         for (let i = 0; i < methodRoute.length; i++) {

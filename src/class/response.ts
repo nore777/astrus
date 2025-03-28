@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 
 
 export class Response {
-  private response: _RES
+  response: _RES
 
   constructor(res: _RES) {
     this.response = res

@@ -1,5 +1,5 @@
 import { buildClientSegments, buildServerSegments } from '../utils/segments.js'
-import { THTTPRequestMethods } from '../types/types.js'
+import { THTTPRequestMethods, TMiddlewares, TRouteHandler } from '../types/types.js'
 import { _REQ, Request } from './request.js'
 import { Response } from './response.js'
 import IRoute from '../types/IRoute.js'
@@ -9,7 +9,8 @@ class Node {
   dynamic: boolean | undefined
   wildcard: boolean | undefined
   value: string | undefined
-  func: (req: Request, res: Response) => void
+  middlewares?: TMiddlewares | undefined
+  func: TRouteHandler
   children: { [key: string]: Node }
   isLeaf: boolean
 
@@ -65,6 +66,7 @@ export default class Routes {
   }
 
   private create(route: IRoute) {
+    console.log("ROUTE", route)
     let current = this.root[route.method]
     const segments = buildServerSegments(route.path)
 
@@ -75,7 +77,6 @@ export default class Routes {
       newNode.dynamic = segments[i].dynamic
       newNode.wildcard = segments[i].wildcard
 
-
       if (!current.children[segments[i].value as string]) {
         current.children = {
           ...current.children,
@@ -84,10 +85,17 @@ export default class Routes {
           }
         }
       }
+
       current = current.children[segments[i].value!]
     }
-    current.isLeaf = true
+
+    if (route.middlewares) {
+      current.middlewares = route.middlewares
+    }
+
     current.func = route.func
+    current.isLeaf = true
+    console.log(current)
   }
 
   search(req: _REQ) {
@@ -128,13 +136,14 @@ export default class Routes {
 
     req.wrapper.url = req.url as string
 
-    if (foundWildcard === true) {
-      return current.func
+    if (foundWildcard) {
+      return current
     }
 
     if (current && i === segments.length) {
       req.wrapper.segments = dynamicSegments
-      return current.func
+      console.log(current)
+      return current
     }
 
     return null
