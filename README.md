@@ -52,7 +52,6 @@ app.route('GET', '/test4/:segment', (req, res) => {
 // Supports multipart form-data
 app.route('GET', '/test5', (req, res) => {
   const { image } = req.body
-  console.log(image.filename)
   res.header('content-type', image.mime)
   res.send(image.value)
 })

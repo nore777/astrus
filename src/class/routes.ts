@@ -66,7 +66,6 @@ export default class Routes {
   }
 
   private create(route: IRoute) {
-    console.log("ROUTE", route)
     let current = this.root[route.method]
     const segments = buildServerSegments(route.path)
 
@@ -95,7 +94,6 @@ export default class Routes {
 
     current.func = route.func
     current.isLeaf = true
-    console.log(current)
   }
 
   search(req: _REQ) {
@@ -142,7 +140,6 @@ export default class Routes {
 
     if (current && i === segments.length) {
       req.wrapper.segments = dynamicSegments
-      console.log(current)
       return current
     }
 

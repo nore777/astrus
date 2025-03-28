@@ -32,7 +32,6 @@ export default class Astrus {
           }
 
         } catch (error) {
-          console.log(error)
           res.write(error)
           res.end()
         }
