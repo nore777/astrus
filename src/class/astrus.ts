@@ -7,6 +7,8 @@ import IRoute from '../types/IRoute.js';
 import continueToRoute from '../utils/continueToRoute.js';
 import fileToContentType from '../utils/fileToContentType.js';
 import fsp from 'fs/promises'
+import fs from 'fs'
+
 
 
 export default class Astrus {
@@ -48,13 +50,28 @@ export default class Astrus {
       try {
         const _url = req.url.substring(url.length, req.url.length)
         const filePath = directory + _url
-        const fileExtention = _url.split('.')[1]
-        const contentType = fileToContentType[fileExtention] || 'application/octet-stream'
+        const fileExt = _url.split('.')[1]
+        const fileSize = fs.statSync(filePath).size
+        const readStream = fs.createReadStream(filePath, { highWaterMark: 16 * 1024 })
+        const contentType = fileToContentType[fileExt] || 'application/octet-stream'
 
-        const file = await fsp.readFile(filePath)
+        res.response.writeHead(200, {
+          'Content-Type': contentType,
+          'Content-Length': fileSize,
+        })
 
-        res.header('Content-Type', contentType)
-        res.send(file)
+        readStream.on('data', async (chunk) => {
+          res.response.write(chunk);
+        });
+
+        readStream.on('end', () => {
+          res.response.end();
+        });
+
+        readStream.on('error', () => {
+          res.response.end()
+        });
+
       } catch (error) {
         res.error()
       }
