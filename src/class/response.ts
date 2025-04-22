@@ -16,7 +16,7 @@ export class Response {
     if (Buffer.isBuffer(data)) {
       this.response.end(data)
     } else if (typeof data === 'object') {
-      this.response.setHeader('content-type', 'application/json')
+      this.response.setHeader('Content-Type', 'application/json')
       this.response.write(JSON.stringify(data))
       this.response.end()
     } else {
