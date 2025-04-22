@@ -9,3 +9,14 @@ export type TMiddlewares = [(req: Request, res: Response, next: Function) => Res
 export type TRouteHandler = (req: Request, res: Response) => void
 
 export type TNext = () => void
+
+type HeaderOverrideMap = {
+  'www-authenticate': 'WWW-Authenticate';
+};
+
+export type CapitalizeHeader<T extends string> =
+  T extends keyof HeaderOverrideMap
+  ? HeaderOverrideMap[T]
+  : T extends `${infer Head}-${infer Tail}`
+  ? `${Capitalize<Head>}-${CapitalizeHeader<Tail>}`
+  : Capitalize<T>;
