@@ -20,12 +20,16 @@ const continueToRoute: { [key in THTTPRequestMethods]: (route: Function, req: _R
     parseBody(route, req, res)
   },
   'CONNECT': (route, req, res) => {
-    parseBody(route, req, res)
+    // NOTE: It's probably best to ignore connect requests since it should be handled
+    // by reverse proxies or similar
+    route(route, req, res)
   },
   'OPTIONS': (route, req, res) => {
     parseBody(route, req, res)
   },
   'TRACE': (route, req, res) => {
+    // NOTE: This isn't necessary since it's used for debugging, when 
+    // developing a server in a low level language
     parseBody(route, req, res)
   },
   'PATCH': (route, req, res) => {
