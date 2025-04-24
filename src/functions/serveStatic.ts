@@ -15,25 +15,25 @@ function serveStatic(this: Astrus, directory: string, url: string) {
       const readStream = fs.createReadStream(filePath, { highWaterMark: 16 * 1024 })
       const contentType = fileToContentType[fileExt] || 'application/octet-stream'
 
-      res.response.writeHead(200, {
+      res._.writeHead(200, {
         'Content-Type': contentType,
         'Content-Length': fileSize,
       })
 
       readStream.on('data', async (chunk) => {
-        res.response.write(chunk);
+        res._.write(chunk);
       });
 
       readStream.on('end', () => {
-        res.response.end();
+        res._.end();
       });
 
       readStream.on('error', () => {
-        res.response.end()
+        res._.end()
       });
 
     } catch (error) {
-      res.response.end()
+      res._.end()
     }
   })
 }

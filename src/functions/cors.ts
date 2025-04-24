@@ -1,4 +1,6 @@
 import Astrus from "../class/astrus.js"
+import { Request } from "../class/request.js"
+import { Response } from "../class/response.js"
 import ICorsOptions from "../types/ICorsOptions.js"
 
 export const corsDefaultOptions: ICorsOptions = {
@@ -18,6 +20,19 @@ export function corsOptions(this: Astrus, options: ICorsOptions) {
   }
 }
 
-export function handleCors(this: Astrus) {
-
+export function handleCors(this: Astrus, req: Request, res: Response) {
 }
+
+
+// res.setHeader('Access-Control-Allow-Methods', this.cors.methods!.join(', '));
+// res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+// res.setHeader('Access-Control-Allow-Credentials', 'true');
+// res.setHeader('Access-Control-Max-Age', '1');
+// res.setHeader('Access-Control-Allow-Origin', '*');
+// return res.end();
+//       } else {
+//   if (req.headers.origin && this.cors.origin!.includes(req.headers.origin)) {
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+//   }
+
+

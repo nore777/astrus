@@ -2,31 +2,31 @@ import { IncomingMessage, ServerResponse } from "http";
 
 
 export class Response {
-  response: _RES
+  _: _RES
 
   constructor(res: _RES) {
-    this.response = res
+    this._ = res
   }
 
   header(name: string, value: string) {
-    this.response.setHeader(name, value)
+    this._.setHeader(name, value)
   }
 
   send(data: string | number | Object | Buffer) {
     if (Buffer.isBuffer(data)) {
-      this.response.end(data)
+      this._.end(data)
     } else if (typeof data === 'object') {
-      this.response.setHeader('Content-Type', 'application/json')
-      this.response.write(JSON.stringify(data))
-      this.response.end()
+      this._.setHeader('Content-Type', 'application/json')
+      this._.write(JSON.stringify(data))
+      this._.end()
     } else {
-      this.response.end(data)
+      this._.end(data)
     }
   }
 
   error(status: number = 500, message: string = "Internal Server Error") {
-    this.response.writeHead(status)
-    this.response.end(message);
+    this._.writeHead(status)
+    this._.end(message);
   }
 }
 

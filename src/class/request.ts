@@ -3,13 +3,13 @@ import { Socket } from 'net'
 
 
 export class Request {
-  request: _REQ
+  _: _REQ
   url: string
   segments: { [key: string]: string }
   body: Object | string
 
   constructor(req: _REQ) {
-    this.request = req
+    this._ = req
     this.url = req.url as string
     this.segments = {}
     this.body = {}
