@@ -2,23 +2,47 @@ import Routes from './routes.js';
 import { _REQ, Request } from './request.js';
 import { _RES, Response } from './response.js';
 import http, { RequestListener } from 'node:http';
-import { THTTPRequestMethods, TMiddlewares, TRouteHandler } from '../types/types.js';
-import IRoute from '../types/IRoute.js';
+import { THTTPRequestMethods } from '../types/types.js';
 import continueToRoute from '../utils/continueToRoute.js';
-import fileToContentType from '../utils/fileToContentType.js';
-import fsp from 'fs/promises'
-import fs from 'fs'
+import ICorsOptions from '../types/ICorsOptions.js';
 
-
+import route from '../functions/route.js';
+import serveStatic from '../functions/serveStatic.js';
+import { corsDefaultOptions, corsOptions } from '../functions/cors.js';
 
 export default class Astrus {
-  private routes: Routes
-  private requestListener: RequestListener<typeof _REQ, typeof _RES> = (req: _REQ, res: _RES) => { }
+  route: typeof route
+  corsOptions: typeof corsOptions
+  serveStatic: typeof serveStatic
+  protected routes: Routes
+  protected cors: ICorsOptions
+  private requestListener: RequestListener<typeof _REQ, typeof _RES> = (_req: _REQ, _res: _RES) => { }
 
   constructor() {
     this.routes = new Routes()
+    this.route = route.bind(this)
+    this.cors = corsDefaultOptions
+    this.corsOptions = corsOptions.bind(this)
+    this.serveStatic = serveStatic.bind(this)
+
     this.requestListener = (req: _REQ, res: _RES) => {
+
+      // cors placeholder
+      if (req.method === 'OPTIONS' && this.cors) {
+        res.setHeader('Access-Control-Allow-Methods', this.cors.methods!.join(', '));
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Max-Age', '1');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        return res.end();
+      } else {
+        if (req.headers.origin && this.cors.origin!.includes(req.headers.origin)) {
+          res.setHeader('Access-Control-Allow-Origin', '*');
+        }
+      }
+
       const found = this.routes.search(req) || null
+
       if (found) {
         try {
           if (found.middlewares) {
@@ -41,85 +65,6 @@ export default class Astrus {
         res.writeHead(404, 'Not Found')
         res.write(`Request [${req.method as string}] Not Found | ${req.url as string}`)
         res.end()
-      }
-    }
-  }
-
-  static(directory: string, url: string) {
-    this.route('GET', url + '/*', async (req, res) => {
-      try {
-        const _url = req.url.substring(url.length, req.url.length)
-        const filePath = directory + _url
-        const fileExt = _url.split('.')[1]
-        const fileSize = fs.statSync(filePath).size
-        const readStream = fs.createReadStream(filePath, { highWaterMark: 16 * 1024 })
-        const contentType = fileToContentType[fileExt] || 'application/octet-stream'
-
-        res.response.writeHead(200, {
-          'Content-Type': contentType,
-          'Content-Length': fileSize,
-        })
-
-        readStream.on('data', async (chunk) => {
-          res.response.write(chunk);
-        });
-
-        readStream.on('end', () => {
-          res.response.end();
-        });
-
-        readStream.on('error', () => {
-          res.response.end()
-        });
-
-      } catch (error) {
-        res.error()
-      }
-    })
-  }
-
-
-  route(
-    method: THTTPRequestMethods,
-    path: string,
-    func: TRouteHandler
-  ): void;
-  route(
-    method: THTTPRequestMethods,
-    path: string,
-    middlewares: TMiddlewares,
-    func: TRouteHandler
-  ): void;
-  route(routes: IRoute[]): void;
-  route(routes: IRoute): void;
-  route(
-    methodRoute: THTTPRequestMethods | IRoute[] | IRoute,
-    path?: string,
-    funcOrMiddlewares?: TMiddlewares | TRouteHandler,
-    func?: TRouteHandler,
-  ) {
-    if (typeof methodRoute === 'string' && path && funcOrMiddlewares) {
-      if (Array.isArray(funcOrMiddlewares)) {
-        this.routes.init({
-          method: methodRoute,
-          path,
-          middlewares: funcOrMiddlewares as TMiddlewares,
-          func: func as TRouteHandler
-        })
-      } else {
-        this.routes.init({
-          method: methodRoute,
-          path,
-          func: funcOrMiddlewares as TRouteHandler
-        })
-      }
-    } else {
-      if (Array.isArray(methodRoute)) {
-        for (let i = 0; i < methodRoute.length; i++) {
-          this.routes.init(methodRoute[i] as IRoute)
-        }
-      } else {
-        this.routes.init(methodRoute as IRoute)
       }
     }
   }
