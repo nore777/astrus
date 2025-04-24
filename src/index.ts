@@ -32,7 +32,9 @@ function route(
   }
 }
 
-
+const middleware = (func: (req: Request, res: Response, next: () => void) => Function) => {
+  return func
+}
 
 const controller = (func: (req: Request, res: Response) => void) => {
   return func
@@ -42,6 +44,7 @@ export default Astrus
 export {
   route,
   controller,
+  middleware,
   Request,
   Response,
 };
