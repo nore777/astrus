@@ -12,7 +12,7 @@ npm i astrus
 ```
 
 ```javascript
-import astrus, { route, controller } from 'astrus' /* Only supports ESM */
+import astrus, { route, controller. middleware } from 'astrus' /* Only supports ESM */
 
 
 // New Astrus instance
@@ -20,12 +20,38 @@ const app = new astrus()
 
 
 // Serve static files
-app.static('./public', '/public')
+app.serveStatic('./public', '/public')
+
+
+// Cors (default options)
+app.corsOptions({
+  origin: null,
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: null,
+  exposedHeaders: null,
+  credentials: false,
+  optionsSuccessStatus: 204,
+  maxAge: 0,
+})
 
 
 // Controller
 const testController = controller((req, res) => {
   res.send("hello world")
+})
+
+
+// Middlewares
+const testMiddleware = (roles) => middleware((req, res, next) => {
+  const { role } = req.segments
+  if (!roles.includes(role)) {
+    return res.send("UNAUTHORIZED")
+  }
+  return next()
+})
+
+const middlewareRoute = route('POST', '/middleware', [testMiddleware(['admin', 'mod'])], (req, res) => {
+  res.send("AUTHORIZED")
 })
 
 
@@ -52,11 +78,12 @@ app.route('GET', '/test4/:segment', (req, res) => {
 // Supports multipart form-data
 app.route('GET', '/test5', (req, res) => {
   const { image } = req.body
-  res.header('content-type', image.mime)
+  res.header('Content-Type', image.mime)
   res.send(image.value)
 })
 
 
-app.start(8000)
+// Start the app
+app.start(8000, () => {console.log("server started successfully")})
 ```
 
