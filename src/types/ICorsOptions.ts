@@ -4,11 +4,11 @@ import { CapitalizeHeader } from "./types.js";
 
 
 export default interface ICorsOptions {
-  origin?: string[] | string,
-  methods?: THTTPRequestMethods[],
-  allowedHeaders?: { [key in keyof IncomingHttpHeaders as CapitalizeHeader<key & string>]: string } | null,
-  exposedHeaders?: { [key in keyof IncomingHttpHeaders as CapitalizeHeader<key & string>]: string } | null,
-  credentials?: boolean,
+  origin?: string[] | null,
+  methods?: THTTPRequestMethods[] | null,
+  allowedHeaders?: string[] | null,
+  exposedHeaders?: string[] | null,
+  credentials?: boolean | null,
   optionsSuccessStatus?: number,
   maxAge?: number,
 }
