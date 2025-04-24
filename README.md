@@ -83,6 +83,13 @@ app.route('GET', '/test5', (req, res) => {
 })
 
 
+// Get lower level variables and functions from IncomingMessage and ServerResponse via _
+app.route('GET', '/test6', (req, res) => {
+  res._.writeHead(/*...*/)
+  res.send(req._.ip)
+})
+
+
 // Start the app
 app.start(8000, () => {console.log("server started successfully")})
 ```
