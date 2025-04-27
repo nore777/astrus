@@ -17,7 +17,7 @@ npm i astrus
 ```
 
 ```javascript
-import astrus, { route, controller. middleware } from 'astrus' /* Only supports ESM */
+import astrus, { route, controller, middleware } from 'astrus' /* Only supports ESM */
 
 
 // New Astrus instance
