@@ -1,6 +1,6 @@
 import Astrus from "../class/astrus.js"
-import { Request } from "../class/request.js"
-import { Response } from "../class/response.js"
+import { _REQ, Request } from "../class/request.js"
+import { _RES, Response } from "../class/response.js"
 import ICorsOptions from "../types/ICorsOptions.js"
 
 export const corsDefaultOptions: ICorsOptions = {
@@ -20,7 +20,21 @@ export function corsOptions(this: Astrus, options: ICorsOptions) {
   }
 }
 
-export function handleCors(this: Astrus, req: Request, res: Response) {
+export function handleCors(this: Astrus, req: _REQ, res: _RES): boolean {
+  if (!this.cors.origin) {
+    return false
+  }
+
+
+  if (req.method === "OPTIONS") {
+    // TODO:
+    return true
+  } else {
+    if (req.headers.origin && this.cors.origin.includes(req.headers.origin)) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    return false
+  }
 }
 
 
