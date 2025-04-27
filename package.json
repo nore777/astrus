@@ -1,13 +1,22 @@
 {
   "name": "astrus",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "lib/index.js",
   "type": "module",
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc"
   },
-  "keywords": ["astrus", "web", "backend", "framework", "RESTful", "typescript", "javascript", "ESM"],
+  "keywords": [
+    "astrus",
+    "web",
+    "backend",
+    "framework",
+    "RESTful",
+    "typescript",
+    "javascript",
+    "ESM"
+  ],
   "files": [
     "lib/",
     "README.md",
