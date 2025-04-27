@@ -20,3 +20,11 @@ export type CapitalizeHeader<T extends string> =
   : T extends `${infer Head}-${infer Tail}`
   ? `${Capitalize<Head>}-${CapitalizeHeader<Tail>}`
   : Capitalize<T>;
+
+export type WithMethods<T> = T & {
+  implement<K extends string, F extends (...args: any[]) => any>(
+    key: K,
+    func: F
+  ): WithMethods<T & Record<K, F>>;
+};
+
