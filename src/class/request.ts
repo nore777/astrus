@@ -1,4 +1,5 @@
 import { IncomingMessage } from 'http'
+import { _RES } from './response.js'
 import { Socket } from 'net'
 
 
@@ -17,9 +18,10 @@ export class Request {
 }
 
 export class _REQ extends IncomingMessage {
+  wrapper: Request
+
   constructor(socket: Socket) {
     super(socket)
     this.wrapper = new Request(this)
   }
-  wrapper: Request
 }

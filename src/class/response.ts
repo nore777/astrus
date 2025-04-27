@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
+import { _REQ } from "./request.js";
 
 
 export class Response {
@@ -31,9 +32,11 @@ export class Response {
 }
 
 export class _RES<Request extends IncomingMessage = IncomingMessage> extends ServerResponse<Request> {
+  wrapper: Response
+
   constructor(req: Request) {
     super(req)
     this.wrapper = new Response(this)
   }
-  wrapper: Response
 }
+
