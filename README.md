@@ -5,6 +5,11 @@ Astrus is a Node.js web framework focused on fast API development. This project 
 
 [GITHUB](https://github.com/nore777/astrus) | [NPM](https://www.npmjs.com/package/astrus)
 
+## work in progress:
+- ability to implement custom req and res functions
+- cors implementation
+- multipart streaming (currently loads into memory)
+
 ## getting started
 
 ```bash
@@ -23,15 +28,16 @@ const app = new astrus()
 app.serveStatic('./public', '/public')
 
 
-// Cors (default options)
+// Cors
 app.corsOptions({
+  // default options
   origin: null,
   methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: null,
-  exposedHeaders: null,
-  credentials: false,
-  optionsSuccessStatus: 204,
-  maxAge: 0,
+  allowedHeaders: null,      // which headers can be send from the browser (null === all)
+  exposedHeaders: null,      // which headers can be accessible by the browser (null === all)
+  credentials: false,        // allow browser to send cookies to back-end
+  optionsSuccessStatus: 204, // success status
+  maxAge: 0,                 // how long to cache the preflight response in seconds
 })
 
 
@@ -47,7 +53,7 @@ const testMiddleware = (roles) => middleware((req, res, next) => {
   if (!roles.includes(role)) {
     return res.send("UNAUTHORIZED")
   }
-  return next()
+  return next() // you must always use return when returning next or Response objects or functions
 })
 
 const middlewareRoute = route('POST', '/middleware', [testMiddleware(['admin', 'mod'])], (req, res) => {
@@ -83,14 +89,25 @@ app.route('GET', '/test5', (req, res) => {
 })
 
 
-// Get lower level variables and functions from IncomingMessage and ServerResponse via _
+// Get lower level variables and functions from IncomingMessage and ServerResponse via the '_' object
 app.route('GET', '/test6', (req, res) => {
-  res._.writeHead(/*...*/)
-  res.send(req._.ip)
+  res._.setHeader('Content-Type', 'application/json')
+  res._.write(JSON.stringify({ address: req._.socket.remoteAddress }))
+  res._.end()
+
+  // NOTE: you can access the wrapper from the _ object, which holds the functions
+  // implemented by Astrus, example:
+  // res._.wrapper._.wrapper._.wrapper.send('')
+  // This is expected behaviour since both reference each other.
 })
 
 
 // Start the app
-app.start(8000, () => {console.log("server started successfully")})
+app.start(
+  'http',                                 // protocol
+  8000,                                   // port
+  {},                                     // options
+  () => { console.log('server started') } // callback
+)
 ```
 
